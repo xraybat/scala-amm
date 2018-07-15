@@ -73,12 +73,9 @@ object Dispatcher {
   object Operander {
     // call with dispatcher function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on
     // remove these and pass on varargs directly to operate() from map(), above?? or not possible with tuple syntax there??
-    def operate0(operands: Dispatcher.Operands.Type, dispatcher: Dispatcher.FunctionSignature, k: String, v: String) =
-      operate(operands, dispatcher, k, v)
-    def operate1(operands: Dispatcher.Operands.Type, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, arg: Option[String]) =
-      operate(operands, dispatcher, k, v, arg)
-    def operate2(operands: Dispatcher.Operands.Type, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, arg1: Option[String], arg2: Option[String]) =
-      operate(operands, dispatcher, k, v, arg1, arg2)
+    def operate0(operands: Dispatcher.Operands.Type, dispatcher: Dispatcher.FunctionSignature, k: String, v: String) = operate(operands, dispatcher, k, v)
+    def operate1(operands: Dispatcher.Operands.Type, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, arg: Option[String]) = operate(operands, dispatcher, k, v, arg)
+    def operate2(operands: Dispatcher.Operands.Type, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, arg1: Option[String], arg2: Option[String]) = operate(operands, dispatcher, k, v, arg1, arg2)
 
     // handle varargs all in one; type ascription (`: _*`) ahoy!
     private def operate(operands: Dispatcher.Operands.Type, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, args: Option[String]*) = {
@@ -108,13 +105,15 @@ def main(args: String*) = {
   )
 
   val mapWith: MapAMapWithAXformMap.XformMap = Map(
-    "key1" ->  (Dispatcher.Functions.Suffix, Dispatcher.Operands.Both, Some("-ix")), // arg supplied
+    // arg supplied
+    "key1" ->  (Dispatcher.Functions.Suffix, Dispatcher.Operands.Both, Some("-ix")), 
     "key2" ->  (Dispatcher.Functions.Suffix, Dispatcher.Operands.Key, Some("-ix")),
     "key3" ->  (Dispatcher.Functions.Suffix, Dispatcher.Operands.Val, Some("-ix")),
     "key4" ->  (Dispatcher.Functions.Prefix, Dispatcher.Operands.Both, Some("ix-")),
     "key5" ->  (Dispatcher.Functions.Prefix, Dispatcher.Operands.Key, Some("ix-")),
     "key6" ->  (Dispatcher.Functions.Prefix, Dispatcher.Operands.Val, Some("ix-")),
-    "key7" ->  (Dispatcher.Functions.Reverse, Dispatcher.Operands.Both, None),       // no arg supplied
+    // no arg supplied
+    "key7" ->  (Dispatcher.Functions.Reverse, Dispatcher.Operands.Both, None),
     "key8" ->  (Dispatcher.Functions.Reverse, Dispatcher.Operands.Key, None),
     "key9" ->  (Dispatcher.Functions.Reverse, Dispatcher.Operands.Val, None),
     "key10" -> (Dispatcher.Functions.Replace, Dispatcher.Operands.Both, Some("new-kv-10")),
