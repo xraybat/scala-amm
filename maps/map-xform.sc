@@ -15,12 +15,12 @@ object MapAMapWithAXformMap {
 
           function match {
             // no extra args apart from k and v
-            case Dispatcher.Functions.Reverse => Operander.operate0(operands, dispatcher, k, v)
+            case Dispatcher.Functions.Reverse => Dispatcher.Operander.operate0(operands, dispatcher, k, v)
 
             // one extra arg (already an `Option`-al) plus k and v
             case Dispatcher.Functions.Suffix
                | Dispatcher.Functions.Prefix
-               | Dispatcher.Functions.Replace => Operander.operate1(operands, dispatcher, k, v, mapXform(k)._3)
+               | Dispatcher.Functions.Replace => Dispatcher.Operander.operate1(operands, dispatcher, k, v, mapXform(k)._3)
 
             case _ => (k, v)  // no xformation, just pass thru
 
@@ -38,27 +38,6 @@ object MapAMapWithAXformMap {
 class MapAMapWithAXformMap(mapStart: MapAMapWithAXformMap.StartMap, mapXform: MapAMapWithAXformMap.XformMap) {
   def map: MapAMapWithAXformMap.EndMap = MapAMapWithAXformMap.map(mapStart, mapXform)
 }
-
-// use this "operander" object to handle dispatching of both/key/val operand variations with diffrerent arg lists: 0, 1, etc
-object Operander {
-  // call with dispatcher function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on
-  // remove these and pass on varargs directly to operate() from map(), above?? or not possible with tuple syntax there??
-  def operate0(operands: Dispatcher.Operands.Type, dispatcher: Dispatcher.FunctionSignature, k: String, v: String) =
-    operate(operands, dispatcher, k, v)
-  def operate1(operands: Dispatcher.Operands.Type, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, arg: Option[String]) =
-    operate(operands, dispatcher, k, v, arg)
-  def operate2(operands: Dispatcher.Operands.Type, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, arg1: Option[String], arg2: Option[String]) =
-    operate(operands, dispatcher, k, v, arg1, arg2)
-
-  // handle varargs all in one; type ascription (`: _*`) ahoy!
-  private def operate(operands: Dispatcher.Operands.Type, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, args: Option[String]*) = {
-    operands match {                   // tuple        // extra args, if any
-      case Dispatcher.Operands.Both => ( dispatcher(k, args: _*), dispatcher(v, args: _*) )
-      case Dispatcher.Operands.Key  => ( dispatcher(k, args: _*), v )  // return v unscathed
-      case Dispatcher.Operands.Val  => ( k, dispatcher(v, args: _*) )  // return k unscathed
-    }
-  } // operate
-} // Operander
 
 // į̵̘͍̻̟͔̥̠̦̕ h͓o̢̼̪̞͢p̳̲͠e̯̦̘̝͈̼̱͝ y̷͕͕ơ̴̵̠ú̹̳̻̳̜’̩̰r̸̢̲͉̼̯̬̥ͅͅe̟̦͕̼̞͇͠ w̶̛̖͖̞͇e̷̯̰͎͖̮l̶̻̩̀͝ļ̰̦͈͢͠
 object Dispatcher {
@@ -89,6 +68,27 @@ object Dispatcher {
     Functions.Reverse -> reverse,
     Functions.Replace -> replace
   )
+
+  // use this "operander" object to handle dispatching of both/key/val operand variations with diffrerent arg lists: 0, 1, etc
+  object Operander {
+    // call with dispatcher function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on
+    // remove these and pass on varargs directly to operate() from map(), above?? or not possible with tuple syntax there??
+    def operate0(operands: Dispatcher.Operands.Type, dispatcher: Dispatcher.FunctionSignature, k: String, v: String) =
+      operate(operands, dispatcher, k, v)
+    def operate1(operands: Dispatcher.Operands.Type, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, arg: Option[String]) =
+      operate(operands, dispatcher, k, v, arg)
+    def operate2(operands: Dispatcher.Operands.Type, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, arg1: Option[String], arg2: Option[String]) =
+      operate(operands, dispatcher, k, v, arg1, arg2)
+
+    // handle varargs all in one; type ascription (`: _*`) ahoy!
+    private def operate(operands: Dispatcher.Operands.Type, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, args: Option[String]*) = {
+      operands match {                   // tuple        // extra args, if any
+        case Dispatcher.Operands.Both => ( dispatcher(k, args: _*), dispatcher(v, args: _*) )
+        case Dispatcher.Operands.Key  => ( dispatcher(k, args: _*), v )  // return v unscathed
+        case Dispatcher.Operands.Val  => ( k, dispatcher(v, args: _*) )  // return k unscathed
+      }
+    } // operate
+  } // Operander
 } // Dispatcher
 
 //======================================
