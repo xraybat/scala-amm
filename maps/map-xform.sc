@@ -41,12 +41,12 @@ class MapAMapWithAXformMap(mapStart: MapAMapWithAXformMap.StartMap, mapXform: Ma
 
 // į̵̘͍̻̟͔̥̠̦̕ h͓o̢̼̪̞͢p̳̲͠e̯̦̘̝͈̼̱͝ y̷͕͕ơ̴̵̠ú̹̳̻̳̜’̩̰r̸̢̲͉̼̯̬̥ͅͅe̟̦͕̼̞͇͠ w̶̛̖͖̞͇e̷̯̰͎͖̮l̶̻̩̀͝ļ̰̦͈͢͠
 object Dispatcher {
-  // either...                              // ...or (and use `Functions.Type` everywhere)
-  sealed trait Functions                    //   object Functions extends Enumeration {
-  case object Suffix extends Functions {}   //     type Type = Value
-  case object Prefix extends Functions {}   //    val Suffix, Prefix, Reverse, Replace = Value
-  case object Reverse extends Functions {}  //   }
-  case object Replace extends Functions {}
+  // either...                            // ...or (and use `Functions.Type` everywhere)
+  sealed trait Functions                  //   object Functions extends Enumeration {
+  case object Suffix extends Functions    //     type Type = Value
+  case object Prefix extends Functions    //     val Suffix, Prefix, Reverse, Replace = Value
+  case object Reverse extends Functions   //   }
+  case object Replace extends Functions 
 
   // signatures should match type `FunctionSignature`; `v` is the value to be xformed,
   // `arg(0...)` are the extra (`Option`-al) args to be applied to the xformation
@@ -67,28 +67,6 @@ object Dispatcher {
   )
 } // Dispatcher
 
-// use this "operander" object to handle dispatching of both/key/val operand variations with diffrerent arg lists: 0, 1, etc
-object Operander {
-  // either...                          // ...or (and use `Operands.Type` everywhere)
-  sealed trait Operands                 //   object Operands extends Enumeration {
-  case object Both extends Operands {}  //     type Type = Value
-  case object Key extends Operands {}   //     val Both, Key, Val = Value
-  case object Val extends Operands {}   //   }
-
-  // call with dispatcher function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on
-  def operate(operands: Operands, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, args: Option[String]*) = {
-    operands match {        // tuple        // extra args, if any
-      // pass varargs via type ascription (`: _*`)
-      case Both => ( dispatcher(k, args: _*), dispatcher(v, args: _*) )
-      case Key  => ( dispatcher(k, args: _*), v )  // return v unscathed
-      case Val  => ( k, dispatcher(v, args: _*) )  // return k unscathed
-    }
-  } // operate
-} // Operander
-
-// companion class for Operander0..n
-class Operander {}
-
 // Operander0..n provide arity checking
 object Operander0 extends Operander {
   def operate(operands: Operander.Operands, dispatcher: Dispatcher.FunctionSignature, k: String, v: String) =
@@ -104,6 +82,28 @@ object Operander2 extends Operander {
   def operate(operands: Operander.Operands, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, arg1: Option[String], arg2: Option[String]) =
     Operander.operate(operands, dispatcher, k, v, arg1, arg2)
 }
+
+// use this "operander" object to handle dispatching of both/key/val operand variations with diffrerent arg lists: 0, 1, etc
+object Operander {
+  // either...                        // ...or (and use `Operands.Type` everywhere)
+  sealed trait Operands               //   object Operands extends Enumeration {
+  case object Both extends Operands   //     type Type = Value
+  case object Key extends Operands    //     val Both, Key, Val = Value
+  case object Val extends Operands    //   }
+
+  // call with dispatcher function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on
+  def operate(operands: Operands, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, args: Option[String]*) = {
+    operands match {        // tuple        // extra args, if any
+      // pass varargs via type ascription (`: _*`)
+      case Both => ( dispatcher(k, args: _*), dispatcher(v, args: _*) )
+      case Key  => ( dispatcher(k, args: _*), v )  // return v unscathed
+      case Val  => ( k, dispatcher(v, args: _*) )  // return k unscathed
+    }
+  } // operate
+} // Operander
+
+// companion class for Operander0..n extends
+class Operander
 
 //======================================
 import ammonite.ops._
