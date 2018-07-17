@@ -1,7 +1,7 @@
 object MapAMapWithAXformMap {
-  type StartMap = Map[String, String]                                                                           // start with a map...
-  type EndMap = StartMap                                                                                        // ...and return a result map
-  type XformMap = Map[String, (Dispatcher.Functions.Type, Dispatcher.Operander.Operands.Type, Option[String])]  // ...xformed via a xformation map
+  type StartMap = Map[String, String]                                                      // start with a map...
+  type EndMap = StartMap                                                                   // ...and return a result map
+  type XformMap = Map[String, (Dispatcher.Functions, Operander.Operands, Option[String])]  // ...xformed via a xformation map
     
   // map a map using (functions in) a xformation map
   def map(mapStart: StartMap, mapXform: XformMap): EndMap = {
@@ -15,12 +15,12 @@ object MapAMapWithAXformMap {
 
           function match {
             // no extra args apart from k and v
-            case Dispatcher.Functions.Reverse => Dispatcher.Operander.operate(operands, dispatcher, k, v)
+            case Dispatcher.Reverse => Operander0.operate(operands, dispatcher, k, v)
 
             // one extra arg (already an `Option`-al) plus k and v
-            case Dispatcher.Functions.Suffix
-               | Dispatcher.Functions.Prefix
-               | Dispatcher.Functions.Replace => Dispatcher.Operander.operate(operands, dispatcher, k, v, mapXform(k)._3)
+            case Dispatcher.Suffix
+               | Dispatcher.Prefix
+               | Dispatcher.Replace => Operander1.operate(operands, dispatcher, k, v, mapXform(k)._3)
 
             case _ => (k, v)  // no xformation, just pass thru
 
@@ -41,10 +41,12 @@ class MapAMapWithAXformMap(mapStart: MapAMapWithAXformMap.StartMap, mapXform: Ma
 
 // į̵̘͍̻̟͔̥̠̦̕ h͓o̢̼̪̞͢p̳̲͠e̯̦̘̝͈̼̱͝ y̷͕͕ơ̴̵̠ú̹̳̻̳̜’̩̰r̸̢̲͉̼̯̬̥ͅͅe̟̦͕̼̞͇͠ w̶̛̖͖̞͇e̷̯̰͎͖̮l̶̻̩̀͝ļ̰̦͈͢͠
 object Dispatcher {
-  object Functions extends Enumeration {
-    type Type = Value
-    val Suffix, Prefix, Reverse, Replace = Value
-  }
+  // either...                              // ...or (and use `Functions.Type` everywhere)
+  sealed trait Functions                    //   object Functions extends Enumeration {
+  case object Suffix extends Functions {}   //     type Type = Value
+  case object Prefix extends Functions {}   //    val Suffix, Prefix, Reverse, Replace = Value
+  case object Reverse extends Functions {}  //   }
+  case object Replace extends Functions {}
 
   // signatures should match type `FunctionSignature`; `v` is the value to be xformed,
   // `arg(0...)` are the extra (`Option`-al) args to be applied to the xformation
@@ -57,36 +59,51 @@ object Dispatcher {
   type FunctionSignature = (String, Option[String]*) => String
 
   // value, not a function
-  val dispatch: Map[Functions.Type, FunctionSignature] = Map(
-    Functions.Suffix -> suffix,
-    Functions.Prefix -> prefix,
-    Functions.Reverse -> reverse,
-    Functions.Replace -> replace
+  val dispatch: Map[Functions, FunctionSignature] = Map(
+    Suffix -> suffix,
+    Prefix -> prefix,
+    Reverse -> reverse,
+    Replace -> replace
   )
-
-  // use this "operander" object to handle dispatching of both/key/val operand variations with diffrerent arg lists: 0, 1, etc
-  object Operander {
-    object Operands extends Enumeration {
-      type Type = Value
-      val Both, Key, Val = Value
-    }
-
-    // operate0..n() offer nothing more than extra arity checking
-    /*def operate0(operands: Operands.Type, dispatcher: FunctionSignature, k: String, v: String) = operate(operands, dispatcher, k, v)
-    def operate1(operands: Operands.Type, dispatcher: FunctionSignature, k: String, v: String, arg: Option[String]) = operate(operands, dispatcher, k, v, arg)
-    def operate2(operands: Operands.Type, dispatcher: FunctionSignature, k: String, v: String, arg1: Option[String], arg2: Option[String]) = operate(operands, dispatcher, k, v, arg1, arg2)*/
-
-    // call with dispatcher function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on
-    def operate(operands: Operands.Type, dispatcher: FunctionSignature, k: String, v: String, args: Option[String]*) = {
-      operands match {        // tuple        // extra args, if any
-        // pass varargs via type ascription (`: _*`)
-        case Operands.Both => ( dispatcher(k, args: _*), dispatcher(v, args: _*) )
-        case Operands.Key  => ( dispatcher(k, args: _*), v )  // return v unscathed
-        case Operands.Val  => ( k, dispatcher(v, args: _*) )  // return k unscathed
-      }
-    } // operate
-  } // Operander
 } // Dispatcher
+
+// use this "operander" object to handle dispatching of both/key/val operand variations with diffrerent arg lists: 0, 1, etc
+object Operander {
+  // either...                          // ...or (and use `Operands.Type` everywhere)
+  sealed trait Operands                 //   object Operands extends Enumeration {
+  case object Both extends Operands {}  //     type Type = Value
+  case object Key extends Operands {}   //     val Both, Key, Val = Value
+  case object Val extends Operands {}   //   }
+
+  // call with dispatcher function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on
+  def operate(operands: Operands, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, args: Option[String]*) = {
+    operands match {        // tuple        // extra args, if any
+      // pass varargs via type ascription (`: _*`)
+      case Both => ( dispatcher(k, args: _*), dispatcher(v, args: _*) )
+      case Key  => ( dispatcher(k, args: _*), v )  // return v unscathed
+      case Val  => ( k, dispatcher(v, args: _*) )  // return k unscathed
+    }
+  } // operate
+} // Operander
+
+// companion class for Operander0..n
+class Operander {}
+
+// Operander0..n provide arity checking
+object Operander0 extends Operander {
+  def operate(operands: Operander.Operands, dispatcher: Dispatcher.FunctionSignature, k: String, v: String) =
+    Operander.operate(operands, dispatcher, k, v)
+}
+
+object Operander1 extends Operander {
+  def operate(operands: Operander.Operands, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, arg: Option[String]) =
+    Operander.operate(operands, dispatcher, k, v, arg)
+}
+
+object Operander2 extends Operander {
+  def operate(operands: Operander.Operands, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, arg1: Option[String], arg2: Option[String]) =
+    Operander.operate(operands, dispatcher, k, v, arg1, arg2)
+}
 
 //======================================
 import ammonite.ops._
@@ -106,28 +123,28 @@ def main(args: String*) = {
 
   val mapWith: MapAMapWithAXformMap.XformMap = Map(
     // arg supplied
-    "key1" ->  (Dispatcher.Functions.Suffix, Dispatcher.Operander.Operands.Both, Some("-ix")), 
-    "key2" ->  (Dispatcher.Functions.Suffix, Dispatcher.Operander.Operands.Key, Some("-ix")),
-    "key3" ->  (Dispatcher.Functions.Suffix, Dispatcher.Operander.Operands.Val, Some("-ix")),
-    "key4" ->  (Dispatcher.Functions.Prefix, Dispatcher.Operander.Operands.Both, Some("ix-")),
-    "key5" ->  (Dispatcher.Functions.Prefix, Dispatcher.Operander.Operands.Key, Some("ix-")),
-    "key6" ->  (Dispatcher.Functions.Prefix, Dispatcher.Operander.Operands.Val, Some("ix-")),
+    "key1" ->  (Dispatcher.Suffix, Operander.Both, Some("-ix")), 
+    "key2" ->  (Dispatcher.Suffix, Operander.Key, Some("-ix")),
+    "key3" ->  (Dispatcher.Suffix, Operander.Val, Some("-ix")),
+    "key4" ->  (Dispatcher.Prefix, Operander.Both, Some("ix-")),
+    "key5" ->  (Dispatcher.Prefix, Operander.Key, Some("ix-")),
+    "key6" ->  (Dispatcher.Prefix, Operander.Val, Some("ix-")),
     // no arg supplied
-    "key7" ->  (Dispatcher.Functions.Reverse, Dispatcher.Operander.Operands.Both, None),
-    "key8" ->  (Dispatcher.Functions.Reverse, Dispatcher.Operander.Operands.Key, None),
-    "key9" ->  (Dispatcher.Functions.Reverse, Dispatcher.Operander.Operands.Val, None),
-    "key10" -> (Dispatcher.Functions.Replace, Dispatcher.Operander.Operands.Both, Some("new-kv-10")),
-    "key11" -> (Dispatcher.Functions.Replace, Dispatcher.Operander.Operands.Key, Some("new-k-11")),
-    "key12" -> (Dispatcher.Functions.Replace, Dispatcher.Operander.Operands.Val, Some("new-v-12")),
+    "key7" ->  (Dispatcher.Reverse, Operander.Both, None),
+    "key8" ->  (Dispatcher.Reverse, Operander.Key, None),
+    "key9" ->  (Dispatcher.Reverse, Operander.Val, None),
+    "key10" -> (Dispatcher.Replace, Operander.Both, Some("new-kv-10")),
+    "key11" -> (Dispatcher.Replace, Operander.Key, Some("new-k-11")),
+    "key12" -> (Dispatcher.Replace, Operander.Val, Some("new-v-12")),
     // after xform, same (k, v)-tuples collapse into a single tuple based on key...
-    "key13" -> (Dispatcher.Functions.Replace, Dispatcher.Operander.Operands.Both, Some("new-kv-13-14")),
-    "key14" -> (Dispatcher.Functions.Replace, Dispatcher.Operander.Operands.Both, Some("new-kv-13-14")),
+    "key13" -> (Dispatcher.Replace, Operander.Both, Some("new-kv-13-14")),
+    "key14" -> (Dispatcher.Replace, Operander.Both, Some("new-kv-13-14")),
     // ...while, after xform, same keys collapse into a single tuple with only one of the values surviving (the first)??...
-    "key15" -> (Dispatcher.Functions.Replace, Dispatcher.Operander.Operands.Key, Some("new-k-15-16")),
-    "key16" -> (Dispatcher.Functions.Replace, Dispatcher.Operander.Operands.Key, Some("new-k-15-16")),
+    "key15" -> (Dispatcher.Replace, Operander.Key, Some("new-k-15-16")),
+    "key16" -> (Dispatcher.Replace, Operander.Key, Some("new-k-15-16")),
     // ...finally, after xform, same values are spread across different key tuples
-    "key17" -> (Dispatcher.Functions.Replace, Dispatcher.Operander.Operands.Val, Some("new-v-17-18")),
-    "key18" -> (Dispatcher.Functions.Replace, Dispatcher.Operander.Operands.Val, Some("new-v-17-18"))
+    "key17" -> (Dispatcher.Replace, Operander.Val, Some("new-v-17-18")),
+    "key18" -> (Dispatcher.Replace, Operander.Val, Some("new-v-17-18"))
   )
 
   println("mapFrom = " + mapFrom)
