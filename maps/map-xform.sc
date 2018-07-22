@@ -1,7 +1,8 @@
+// į̵̘͍̻̟͔̥̠̦̕ h͓o̢̼̪̞͢p̳̲͠e̯̦̘̝͈̼̱͝ y̷͕͕ơ̴̵̠ú̹̳̻̳̜’̩̰r̸̢̲͉̼̯̬̥ͅͅe̟̦͕̼̞͇͠ w̶̛̖͖̞͇e̷̯̰͎͖̮l̶̻̩̀͝ļ̰̦͈͢͠
 object MapAMapWithAXformMap {
   type StartMap = Map[String, String]                                                      // start with a map...
   type EndMap = StartMap                                                                   // ...and return a result map
-  type XformMap = Map[String, (Dispatcher.Functions, Operander.Operands, Option[String])]  // ...xformed via a xformation map
+  type XformMap = Map[String, (Xformer.Functions, Operander.Operands, Option[String])]  // ...xformed via a xformation map
     
   // map a map using (functions in) a xformation map
   def map(mapStart: StartMap, mapXform: XformMap): EndMap = {
@@ -15,12 +16,12 @@ object MapAMapWithAXformMap {
 
           function match {
             // no extra args apart from k and v
-            case Dispatcher.Reverse => Operander0.operate(operands, dispatcher, k, v)
+            case Xformer.Reverse => Operander0.operate(operands, dispatcher, k, v)
 
             // one extra arg (already an `Option`-al) plus k and v
-            case Dispatcher.Suffix
-               | Dispatcher.Prefix
-               | Dispatcher.Replace => Operander1.operate(operands, dispatcher, k, v, mapXform(k)._3)
+            case Xformer.Suffix
+               | Xformer.Prefix
+               | Xformer.Replace => Operander1.operate(operands, dispatcher, k, v, mapXform(k)._3)
 
             case _ => (k, v)  // no xformation, just pass thru
 
@@ -39,8 +40,24 @@ class MapAMapWithAXformMap(mapStart: MapAMapWithAXformMap.StartMap, mapXform: Ma
   def map: MapAMapWithAXformMap.EndMap = MapAMapWithAXformMap.map(mapStart, mapXform)
 }
 
-// į̵̘͍̻̟͔̥̠̦̕ h͓o̢̼̪̞͢p̳̲͠e̯̦̘̝͈̼̱͝ y̷͕͕ơ̴̵̠ú̹̳̻̳̜’̩̰r̸̢̲͉̼̯̬̥ͅͅe̟̦͕̼̞͇͠ w̶̛̖͖̞͇e̷̯̰͎͖̮l̶̻̩̀͝ļ̰̦͈͢͠
+// dispatcher for xformer functions
+// ditch enum and just store derived Xformers (as case objects)??
 object Dispatcher {
+  // value, not a function
+  val dispatch: Map[Xformer.Functions, Xformer.FunctionSignature] = Map(
+    Xformer.Suffix  -> Suffix.op,
+    Xformer.Prefix  -> Prefix.op,
+    Xformer.Reverse -> Reverse.op,
+    Xformer.Replace -> Replace.op
+  )
+} // Dispatcher
+
+// xformer function
+// ditch enum and just store derived Xformers (as case objects)??
+object Xformer {
+  // xformer functions use optional varargs
+  type FunctionSignature = (String, Option[String]*) => String
+
   // either...                            // ...or (and use `Functions.Type` everywhere)
   sealed trait Functions                  //   object Functions extends Enumeration {
   case object Suffix extends Functions    //     type Type = Value
@@ -48,42 +65,49 @@ object Dispatcher {
   case object Reverse extends Functions   //   }
   case object Replace extends Functions 
 
-  // signatures should match type `FunctionSignature`; `v` is the value to be xformed,
-  // `arg(0...)` are the extra (`Option`-al) args to be applied to the xformation
-  private def suffix(v: String, args: Option[String]*): String = v + args(0).getOrElse("")
-  private def prefix(v: String, args: Option[String]*): String = args(0).getOrElse("") + v
-  private def reverse(v: String, args: Option[String]*): String = v.reverse
-  private def replace(v: String, args: Option[String]*): String = args(0).getOrElse(v)    // if no replacement string just return original
-  
-  // dispatcher functions use optional varargs
-  type FunctionSignature = (String, Option[String]*) => String
+} // Xformer
 
-  // value, not a function
-  val dispatch: Map[Functions, FunctionSignature] = Map(
-    Suffix -> suffix,
-    Prefix -> prefix,
-    Reverse -> reverse,
-    Replace -> replace
-  )
-} // Dispatcher
+// companion (abstract) class for xformer case objects insisting on `op()` method
+abstract class Xformer {
+  def op(v: String, args: Option[String]*): String
+}
+
+// signatures should match type `FunctionSignature`; `v` is the value to be xformed,
+// `arg(0...)` are the extra (`Option`-al) args to be applied to the xformation
+case object Suffix extends Xformer {
+  override def op(v: String, args: Option[String]*): String = v + args(0).getOrElse("")
+}
+
+case object Prefix extends Xformer {
+  override def op(v: String, args: Option[String]*): String = args(0).getOrElse("") + v
+}
+
+case object Reverse extends Xformer {
+  override def op(v: String, args: Option[String]*): String = v.reverse
+}
+
+case object Replace extends Xformer {
+  override def op(v: String, args: Option[String]*): String = args(0).getOrElse(v)    // if no replacement string just return original
+}
 
 // Operander0..n provide arity checking
 object Operander0 extends Operander {
-  def operate(operands: Operander.Operands, dispatcher: Dispatcher.FunctionSignature, k: String, v: String) =
+  def operate(operands: Operander.Operands, dispatcher: Xformer.FunctionSignature, k: String, v: String) =
     Operander.operate(operands, dispatcher, k, v)
 }
 
 object Operander1 extends Operander {
-  def operate(operands: Operander.Operands, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, arg: Option[String]) =
+  def operate(operands: Operander.Operands, dispatcher: Xformer.FunctionSignature, k: String, v: String, arg: Option[String]) =
     Operander.operate(operands, dispatcher, k, v, arg)
 }
 
 object Operander2 extends Operander {
-  def operate(operands: Operander.Operands, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, arg1: Option[String], arg2: Option[String]) =
+  def operate(operands: Operander.Operands, dispatcher: Xformer.FunctionSignature, k: String, v: String, arg1: Option[String], arg2: Option[String]) =
     Operander.operate(operands, dispatcher, k, v, arg1, arg2)
 }
 
 // use this "operander" object to handle dispatching of both/key/val operand variations with diffrerent arg lists: 0, 1, etc
+// ditch enum and just store derived Xformers (as case objects)??
 object Operander {
   // either...                        // ...or (and use `Operands.Type` everywhere)
   sealed trait Operands               //   object Operands extends Enumeration {
@@ -92,7 +116,7 @@ object Operander {
   case object Val extends Operands    //   }
 
   // call with dispatcher function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on
-  def operate(operands: Operands, dispatcher: Dispatcher.FunctionSignature, k: String, v: String, args: Option[String]*) = {
+  def operate(operands: Operands, dispatcher: Xformer.FunctionSignature, k: String, v: String, args: Option[String]*) = {
     operands match {        // tuple        // extra args, if any
       // pass varargs via type ascription (`: _*`)
       case Both => ( dispatcher(k, args: _*), dispatcher(v, args: _*) )
@@ -123,28 +147,28 @@ def main(args: String*) = {
 
   val mapWith: MapAMapWithAXformMap.XformMap = Map(
     // arg supplied
-    "key1" ->  (Dispatcher.Suffix, Operander.Both, Some("-ix")), 
-    "key2" ->  (Dispatcher.Suffix, Operander.Key, Some("-ix")),
-    "key3" ->  (Dispatcher.Suffix, Operander.Val, Some("-ix")),
-    "key4" ->  (Dispatcher.Prefix, Operander.Both, Some("ix-")),
-    "key5" ->  (Dispatcher.Prefix, Operander.Key, Some("ix-")),
-    "key6" ->  (Dispatcher.Prefix, Operander.Val, Some("ix-")),
+    "key1" ->  (Xformer.Suffix, Operander.Both, Some("-ix")), 
+    "key2" ->  (Xformer.Suffix, Operander.Key, Some("-ix")),
+    "key3" ->  (Xformer.Suffix, Operander.Val, Some("-ix")),
+    "key4" ->  (Xformer.Prefix, Operander.Both, Some("ix-")),
+    "key5" ->  (Xformer.Prefix, Operander.Key, Some("ix-")),
+    "key6" ->  (Xformer.Prefix, Operander.Val, Some("ix-")),
     // no arg supplied
-    "key7" ->  (Dispatcher.Reverse, Operander.Both, None),
-    "key8" ->  (Dispatcher.Reverse, Operander.Key, None),
-    "key9" ->  (Dispatcher.Reverse, Operander.Val, None),
-    "key10" -> (Dispatcher.Replace, Operander.Both, Some("new-kv-10")),
-    "key11" -> (Dispatcher.Replace, Operander.Key, Some("new-k-11")),
-    "key12" -> (Dispatcher.Replace, Operander.Val, Some("new-v-12")),
+    "key7" ->  (Xformer.Reverse, Operander.Both, None),
+    "key8" ->  (Xformer.Reverse, Operander.Key, None),
+    "key9" ->  (Xformer.Reverse, Operander.Val, None),
+    "key10" -> (Xformer.Replace, Operander.Both, Some("new-kv-10")),
+    "key11" -> (Xformer.Replace, Operander.Key, Some("new-k-11")),
+    "key12" -> (Xformer.Replace, Operander.Val, Some("new-v-12")),
     // after xform, same (k, v)-tuples collapse into a single tuple based on key...
-    "key13" -> (Dispatcher.Replace, Operander.Both, Some("new-kv-13-14")),
-    "key14" -> (Dispatcher.Replace, Operander.Both, Some("new-kv-13-14")),
+    "key13" -> (Xformer.Replace, Operander.Both, Some("new-kv-13-14")),
+    "key14" -> (Xformer.Replace, Operander.Both, Some("new-kv-13-14")),
     // ...while, after xform, same keys collapse into a single tuple with only one of the values surviving (the first)??...
-    "key15" -> (Dispatcher.Replace, Operander.Key, Some("new-k-15-16")),
-    "key16" -> (Dispatcher.Replace, Operander.Key, Some("new-k-15-16")),
+    "key15" -> (Xformer.Replace, Operander.Key, Some("new-k-15-16")),
+    "key16" -> (Xformer.Replace, Operander.Key, Some("new-k-15-16")),
     // ...finally, after xform, same values are spread across different key tuples
-    "key17" -> (Dispatcher.Replace, Operander.Val, Some("new-v-17-18")),
-    "key18" -> (Dispatcher.Replace, Operander.Val, Some("new-v-17-18"))
+    "key17" -> (Xformer.Replace, Operander.Val, Some("new-v-17-18")),
+    "key18" -> (Xformer.Replace, Operander.Val, Some("new-v-17-18"))
   )
 
   println("mapFrom = " + mapFrom)
