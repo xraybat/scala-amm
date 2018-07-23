@@ -12,10 +12,11 @@ object MapAMapWithAXformMap {
         // make sure to return a tuple from all paths
         if (mapXform.contains(k)) {
           val function = mapXform(k)._1
-          val dispatcher = Dispatcher.dispatch(function)._2
+          val dispatcher = function.op _
+          val operander = Dispatcher.dispatch(function)
           val operands = mapXform(k)._2
 
-          // use Operander0..n stored in `Dispatcher.dispatch(function)._1`??
+          // use Operander0..n stored in v??
           function match {
             // no extra args apart from k and v
             case Reverse => Operander0.op(operands, dispatcher, k, v)
@@ -46,11 +47,12 @@ class MapAMapWithAXformMap(mapStart: MapAMapWithAXformMap.StartMap, mapXform: Ma
 // dispatcher for xform functions
 object Dispatcher {
   // value, not a function, indexed by xform function
-  val dispatch: Map[XformFunc, (Operander, XformFunc.Signature)] = Map(
-    Suffix  -> (Operander1, Suffix.op),
-    Prefix  -> (Operander1, Prefix.op),
-    Reverse -> (Operander0, Reverse.op),
-    Replace -> (Operander1, Replace.op)
+  // don't store XformFunc.op in value tuple, just use it from *key* XformFunc??
+  val dispatch: Map[XformFunc, Operander] = Map(
+    Suffix  -> Operander1,
+    Prefix  -> Operander1,
+    Reverse -> Operander0,
+    Replace -> Operander1
   )
 } // Dispatcher
 
