@@ -16,7 +16,7 @@ object MapAMapWithAXformMap {
           val operander = Dispatcher.dispatch(function)
           val operands = mapXform(k)._2
 
-          // use Operander0..n stored in v??
+          // use Operander0..n stored in `Dispatcher.dispatch(function)`??
           function match {
             case Reverse => Operander0.op(operands, dispatcher, k, v) // no extra args apart from k and v
             case Suffix | Prefix | Replace => Operander1.op(operands, dispatcher, k, v, mapXform(k)._3) // one extra arg (already an `Option`-al) plus k and v
