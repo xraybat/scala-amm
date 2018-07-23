@@ -18,14 +18,8 @@ object MapAMapWithAXformMap {
 
           // use Operander0..n stored in v??
           function match {
-            // no extra args apart from k and v
-            case Reverse => Operander0.op(operands, dispatcher, k, v)
-
-            // one extra arg (already an `Option`-al) plus k and v
-            case Suffix
-               | Prefix
-               | Replace => Operander1.op(operands, dispatcher, k, v, mapXform(k)._3)
-
+            case Reverse => Operander0.op(operands, dispatcher, k, v) // no extra args apart from k and v
+            case Suffix | Prefix | Replace => Operander1.op(operands, dispatcher, k, v, mapXform(k)._3) // one extra arg (already an `Option`-al) plus k and v
             case _ => (k, v)  // no xformation, just pass thru
 
           } // match
