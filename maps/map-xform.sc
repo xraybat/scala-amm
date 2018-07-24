@@ -84,17 +84,17 @@ abstract class Xformer {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Arity0..n provide arity checking
 object Arity0 extends Arity {
-  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String) =
+  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String): (String, String) =
     Arity.op(operands, dispatcher, k, v)
 }
 
 object Arity1 extends Arity {
-  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, arg: Option[String]) =
+  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, arg: Option[String]): (String, String) =
     Arity.op(operands, dispatcher, k, v, arg)
 }
 
 object Arity2 extends Arity {
-  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, arg1: Option[String], arg2: Option[String]) =
+  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, arg1: Option[String], arg2: Option[String]): (String, String) =
     Arity.op(operands, dispatcher, k, v, arg1, arg2)
 }
 
@@ -102,7 +102,7 @@ object Arity2 extends Arity {
 //   `Arity.op()` becomes `super.op()` when object -> abstract class??
 object Arity {
   // call with dispatcher function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on
-  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*) = {
+  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) = {
     // pass varargs, if any, via type ascription (`: _*`)
     operands match {
       case Both => ( dispatcher(k, args: _*), dispatcher(v, args: _*) )
@@ -116,13 +116,26 @@ object Arity {
 abstract class Arity
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+// pass varargs, if any, via type ascription (`: _*`)
+case object Both extends Operands {
+  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
+    ( dispatcher(k, args: _*), dispatcher(v, args: _*) )
+}
 
-case object Both extends Operands
-case object Key extends Operands
-case object Val extends Operands
+case object Key extends Operands {
+  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
+    ( dispatcher(k, args: _*), v )  // return v unscathed
+}
+
+case object Val extends Operands {
+  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
+    ( k, dispatcher(v, args: _*) )  // return k unscathed
+}
 
 // use this operands object to handle both/key/val operand variations
-sealed trait Operands
+abstract class Operands {
+  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String)
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 import ammonite.ops._
