@@ -103,6 +103,9 @@ object Arity2 extends Arity {
 object Arity {
   // call with dispatcher function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on
   def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) = {
+    // just simply call??
+    //operands.op(dispatcher, k, v, args: _*)
+
     // pass varargs, if any, via type ascription (`: _*`)
     operands match {
       case Both => ( dispatcher(k, args: _*), dispatcher(v, args: _*) )
@@ -118,23 +121,23 @@ abstract class Arity
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // pass varargs, if any, via type ascription (`: _*`)
 case object Both extends Operands {
-  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
+  def op(dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
     ( dispatcher(k, args: _*), dispatcher(v, args: _*) )
 }
 
 case object Key extends Operands {
-  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
+  def op(dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
     ( dispatcher(k, args: _*), v )  // return v unscathed
 }
 
 case object Val extends Operands {
-  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
+  def op(dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
     ( k, dispatcher(v, args: _*) )  // return k unscathed
 }
 
 // use this operands object to handle both/key/val operand variations
 abstract class Operands {
-  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String)
+  def op(dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
