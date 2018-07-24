@@ -99,21 +99,12 @@ object Arity2 extends Arity {
 }
 
 // use this arity object to handle dispatching of vararg lists: 0, 1, etc
-//   chagne obj to abstract class and `Arity.op()` becomes `super.op()` when object -> abstract class??
+//   change obj to abstract class and `Arity.op()` becomes `super.op()` when object -> abstract class??
 object Arity {
   // call with dispatcher function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on
-  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) = {
-    // just simply call??
-    //operands.op(dispatcher, k, v, args: _*)
-
-    // pass varargs, if any, via type ascription (`: _*`)
-    operands match {
-      case Both => ( dispatcher(k, args: _*), dispatcher(v, args: _*) )
-      case Key  => ( dispatcher(k, args: _*), v )  // return v unscathed
-      case Val  => ( k, dispatcher(v, args: _*) )  // return k unscathed
-    }
-  } // op
-} // Arity
+  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
+    operands.op(dispatcher, k, v, args: _*)
+}
 
 // companion class for Arity0..n extends
 abstract class Arity
