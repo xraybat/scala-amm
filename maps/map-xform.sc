@@ -83,6 +83,7 @@ abstract class Xformer {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Arity0..n provide arity checking
+// put `override def op()` in subclasses??
 object Arity0 extends Arity {
   def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String): (String, String) =
     Arity.op(operands, dispatcher, k, v)
