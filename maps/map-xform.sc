@@ -112,17 +112,17 @@ abstract class Arity
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // pass varargs, if any, via type ascription (`: _*`)
 case object Both extends Operands {
-  def op(dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
+  override def op(dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
     ( dispatcher(k, args: _*), dispatcher(v, args: _*) )
 }
 
 case object Key extends Operands {
-  def op(dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
+  override def op(dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
     ( dispatcher(k, args: _*), v )  // return v unscathed
 }
 
 case object Val extends Operands {
-  def op(dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
+  override def op(dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
     ( k, dispatcher(v, args: _*) )  // return k unscathed
 }
 
