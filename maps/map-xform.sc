@@ -98,15 +98,13 @@ object Arity2 extends Arity {
     Arity.op(operands, dispatcher, k, v, arg1, arg2)
 }
 
-// use this arity object to handle dispatching of both/key/val operand variations with diffrerent arg lists: 0, 1, etc
-// Arity base class with derived case objects Both/Key/Val *as well as* Arity0..n arg count??
-//   remove this object when/if enum goes??
+// use this arity object to handle dispatching of vararg lists: 0, 1, etc
 //   `Arity.op()` becomes `super.op()` when object -> abstract class??
 object Arity {
   // call with dispatcher function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on
   def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*) = {
-    operands match {        // tuple        // extra args, if any
-      // pass varargs via type ascription (`: _*`)
+    // pass varargs, if any, via type ascription (`: _*`)
+    operands match {
       case Both => ( dispatcher(k, args: _*), dispatcher(v, args: _*) )
       case Key  => ( dispatcher(k, args: _*), v )  // return v unscathed
       case Val  => ( k, dispatcher(v, args: _*) )  // return k unscathed
@@ -123,6 +121,7 @@ case object Both extends Operands
 case object Key extends Operands
 case object Val extends Operands
 
+// use this operands object to handle both/key/val operand variations
 sealed trait Operands
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
