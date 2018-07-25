@@ -21,8 +21,7 @@ object MapAMapWithAXformMap {
             case Reverse => arity.op(operands, xformer, k, v) // no extra args apart from k and v
             case Suffix | Prefix | Replace => arity.op(operands, xformer, k, v, mapXform(k)._3) // one extra arg (already an `Option`-al) plus k and v
             case _ => (k, v)  // no xformation, just pass thru
-
-          } // match
+          }
         } // if
         else
           (k, v)  // no xformation, just pass thru
