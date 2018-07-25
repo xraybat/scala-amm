@@ -16,10 +16,10 @@ object MapAMapWithAXformMap {
           val arity = Dispatcher.dispatch(function)
           val operands = mapXform(k)._2
 
-          // use Arity0..n stored in `Dispatcher.dispatch(function)`?? how to handle varargs??
+          // how to handle varargs in single call to `arity.op()`??
           function match {
-            case Reverse => Arity0.op(operands, xformer, k, v) // no extra args apart from k and v
-            case Suffix | Prefix | Replace => Arity1.op(operands, xformer, k, v, mapXform(k)._3) // one extra arg (already an `Option`-al) plus k and v
+            case Reverse => arity.op(operands, xformer, k, v) // no extra args apart from k and v
+            case Suffix | Prefix | Replace => arity.op(operands, xformer, k, v, mapXform(k)._3) // one extra arg (already an `Option`-al) plus k and v
             case _ => (k, v)  // no xformation, just pass thru
 
           } // match
