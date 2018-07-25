@@ -17,6 +17,7 @@ object MapAMapWithAXformMap {
           val operands = mapXform(k)._2
 
           // how to handle varargs in single call to `arity.op()`??
+          // don't call Arity0..n (via arity) but just goes to base class with `: _*`??
           function match {
             case Reverse => arity.op(operands, xformer, k, v) // no extra args apart from k and v
             case Suffix | Prefix | Replace => arity.op(operands, xformer, k, v, mapXform(k)._3) // one extra arg (already an `Option`-al) plus k and v
