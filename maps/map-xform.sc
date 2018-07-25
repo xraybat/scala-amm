@@ -41,7 +41,6 @@ class MapAMapWithAXformMap(mapStart: MapAMapWithAXformMap.StartMap, mapXform: Ma
 // dispatcher for xform functions
 object Dispatcher {
   // value, not a function, indexed by xform function
-  // don't store Xformer.op in value tuple, just use it from *key* Xformer??
   val dispatch: Map[Xformer, Arity] = Map(
     Suffix  -> Arity1,
     Prefix  -> Arity1,
