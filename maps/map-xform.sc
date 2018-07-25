@@ -65,12 +65,10 @@ case object Replace extends Xformer {
   override def op(v: String, args: Option[String]*): String = args(0).getOrElse(v)    // if no replacement string just return original
 }
 
-// xform function; remove this object when/if enum goes??
 object Xformer {
   // xform functions use optional varargs
   type Signature = (String, Option[String]*) => String
-
-} // Xformer
+}
 
 // companion (abstract) class for xform function case object extends; insists on `op()` method
 abstract class Xformer {
