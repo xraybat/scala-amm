@@ -90,7 +90,7 @@ case object Arity2 extends Arity {
     super.op(operands, dispatcher, k, v, arg1, arg2)
 }
 
-// handles arg list variations (varargs); don't use `override` as they *aren't* overrides of the `op()`
+// handles arg list variations (varargs); don't use `override` as they *aren't* overrides of `op()`
 abstract class Arity {
   // call with dispatcher function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on
   def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
