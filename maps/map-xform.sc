@@ -96,6 +96,7 @@ case object Arity2 extends Arity {
 case object ArityN extends Arity  // dummy for dispatcher obj??
 
 // handles arg list variations (varargs); don't use `override` as they *aren't* overrides of `op()`
+// DO WE EVEN NEED ARITY NOW or just go thru to Operands.op??
 object Arity {
   // call with xformer function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on??
   def op(operands: Operands, xformer: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
