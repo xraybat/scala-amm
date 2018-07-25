@@ -80,7 +80,8 @@ abstract class Xformer {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Arity0..n provide arity checking
-/*case object Arity0 extends Arity {
+/* no longer used due to `Arity.op()` directly??
+case object Arity0 extends Arity {
   def op(operands: Operands, xformer: Xformer.Signature, k: String, v: String): (String, String) =
     Arity.op(operands, xformer, k, v)
 }
