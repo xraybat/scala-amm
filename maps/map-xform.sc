@@ -83,32 +83,28 @@ abstract class Xformer {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Arity0..n provide arity checking
-// put `override def op()` in subclasses??
+// don't use overrides as they *aren't* overrides of the *same* method
 object Arity0 extends Arity {
   def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String): (String, String) =
-    Arity.op(operands, dispatcher, k, v)
+    super.op(operands, dispatcher, k, v)
 }
 
 object Arity1 extends Arity {
   def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, arg: Option[String]): (String, String) =
-    Arity.op(operands, dispatcher, k, v, arg)
+    super.op(operands, dispatcher, k, v, arg)
 }
 
 object Arity2 extends Arity {
   def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, arg1: Option[String], arg2: Option[String]): (String, String) =
-    Arity.op(operands, dispatcher, k, v, arg1, arg2)
+    super.op(operands, dispatcher, k, v, arg1, arg2)
 }
 
-// use this arity object to handle dispatching of vararg lists: 0, 1, etc
-//   change obj to abstract class and `Arity.op()` sub op()s become `super.op()` when object -> abstract class??
-object Arity {
+abstract class Arity {
   // call with dispatcher function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on
   def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
     operands.op(dispatcher, k, v, args: _*)
-}
 
-// companion class for Arity0..n extends
-abstract class Arity
+} // Arity
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // pass varargs, if any, via type ascription (`: _*`)
