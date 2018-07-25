@@ -12,14 +12,14 @@ object MapAMapWithAXformMap {
         // make sure to return a tuple from all paths
         if (mapXform.contains(k)) {
           val function = mapXform(k)._1
-          val dispatcher = function.op _
-          val operander = Dispatcher.dispatch(function)
+          val xformer = function.op _
+          val arity = Dispatcher.dispatch(function)
           val operands = mapXform(k)._2
 
           // use Arity0..n stored in `Dispatcher.dispatch(function)`?? how to handle varargs??
           function match {
-            case Reverse => Arity0.op(operands, dispatcher, k, v) // no extra args apart from k and v
-            case Suffix | Prefix | Replace => Arity1.op(operands, dispatcher, k, v, mapXform(k)._3) // one extra arg (already an `Option`-al) plus k and v
+            case Reverse => Arity0.op(operands, xformer, k, v) // no extra args apart from k and v
+            case Suffix | Prefix | Replace => Arity1.op(operands, xformer, k, v, mapXform(k)._3) // one extra arg (already an `Option`-al) plus k and v
             case _ => (k, v)  // no xformation, just pass thru
 
           } // match
@@ -78,44 +78,44 @@ abstract class Xformer {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Arity0..n provide arity checking
 case object Arity0 extends Arity {
-  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String): (String, String) =
-    super.op(operands, dispatcher, k, v)
+  def op(operands: Operands, xformer: Xformer.Signature, k: String, v: String): (String, String) =
+    super.op(operands, xformer, k, v)
 }
 case object Arity1 extends Arity {
-  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, arg: Option[String]): (String, String) =
-    super.op(operands, dispatcher, k, v, arg)
+  def op(operands: Operands, xformer: Xformer.Signature, k: String, v: String, arg: Option[String]): (String, String) =
+    super.op(operands, xformer, k, v, arg)
 }
 case object Arity2 extends Arity {
-  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, arg1: Option[String], arg2: Option[String]): (String, String) =
-    super.op(operands, dispatcher, k, v, arg1, arg2)
+  def op(operands: Operands, xformer: Xformer.Signature, k: String, v: String, arg1: Option[String], arg2: Option[String]): (String, String) =
+    super.op(operands, xformer, k, v, arg1, arg2)
 }
 
 // handles arg list variations (varargs); don't use `override` as they *aren't* overrides of `op()`
 abstract class Arity {
-  // call with dispatcher function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on
-  def op(operands: Operands, dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
-    operands.op(dispatcher, k, v, args: _*)
+  // call with xformer function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on??
+  def op(operands: Operands, xformer: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
+    operands.op(xformer, k, v, args: _*)
 
 } // Arity
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // pass varargs, if any, via type ascription (`: _*`)
 case object Both extends Operands {
-  override def op(dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
-    ( dispatcher(k, args: _*), dispatcher(v, args: _*) )
+  override def op(xformer: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
+    ( xformer(k, args: _*), xformer(v, args: _*) )
 }
 case object Key extends Operands {
-  override def op(dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
-    ( dispatcher(k, args: _*), v )  // return v unscathed
+  override def op(xformer: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
+    ( xformer(k, args: _*), v )  // return v unscathed
 }
 case object Val extends Operands {
-  override def op(dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
-    ( k, dispatcher(v, args: _*) )  // return k unscathed
+  override def op(xformer: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
+    ( k, xformer(v, args: _*) )  // return k unscathed
 }
 
 // handles both/key/val operand variations
 abstract class Operands {
-  def op(dispatcher: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String)
+  def op(xformer: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
