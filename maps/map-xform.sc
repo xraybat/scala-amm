@@ -13,7 +13,6 @@ object MapAMapWithAXformMap {
         if (mapXform.contains(k)) {
           val function = mapXform(k)._1
           val xformer = function.op _
-          //val arity = Dispatcher.dispatch(function) // not used now??
           val operands = mapXform(k)._2
           val arg = mapXform(k)._3  // already an `Option`-al
 
@@ -22,7 +21,7 @@ object MapAMapWithAXformMap {
             case Reverse
                | Suffix
                | Prefix
-               | Replace => Arity.op(operands, xformer, k, v, arg)
+               | Replace => operands.op(xformer, k, v, arg)
             case _ => (k, v)  // no xformation, just pass thru
           }
         } // if
@@ -38,19 +37,6 @@ object MapAMapWithAXformMap {
 class MapAMapWithAXformMap(mapStart: MapAMapWithAXformMap.StartMap, mapXform: MapAMapWithAXformMap.XformMap) {
   def map: MapAMapWithAXformMap.EndMap = MapAMapWithAXformMap.map(mapStart, mapXform)
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// dispatcher for xform functions
-object Dispatcher {
-  // value, not a function, indexed by xform function
-  val dispatch: Map[Xformer, Arity] = Map(
-    // Arity0..n not really used now??
-    Suffix  -> ArityN, //Arity1,
-    Prefix  -> ArityN, //Arity1,
-    Reverse -> ArityN, //Arity0,
-    Replace -> ArityN  //Arity1
-  )
-} // Dispatcher
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // xform functions; signatures should match type `Signature`; `v` is the value to be xformed,
@@ -77,34 +63,6 @@ object Xformer {
 abstract class Xformer {
   def op(v: String, args: Option[String]*): String
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// Arity0..n provide arity checking
-/* no longer used due to `Arity.op()` directly??
-case object Arity0 extends Arity {
-  def op(operands: Operands, xformer: Xformer.Signature, k: String, v: String): (String, String) =
-    Arity.op(operands, xformer, k, v)
-}
-case object Arity1 extends Arity {
-  def op(operands: Operands, xformer: Xformer.Signature, k: String, v: String, arg: Option[String]): (String, String) =
-    Arity.op(operands, xformer, k, v, arg)
-}
-case object Arity2 extends Arity {
-  def op(operands: Operands, xformer: Xformer.Signature, k: String, v: String, arg1: Option[String], arg2: Option[String]): (String, String) =
-    Arity.op(operands, xformer, k, v, arg1, arg2)
-}*/
-case object ArityN extends Arity  // dummy for dispatcher obj??
-
-// handles arg list variations (varargs); don't use `override` as they *aren't* overrides of `op()`
-// DO WE EVEN NEED ARITY NOW or just go thru to Operands.op??
-object Arity {
-  // call with xformer function as mapXform(k)._1, operands as mapXform(k)._2, args as mapXform(k)._3 and so on??
-  def op(operands: Operands, xformer: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
-    operands.op(xformer, k, v, args: _*)
-}
-
-// companion (abstract) class for aritu0..n case object extends
-abstract class Arity
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // pass varargs, if any, via type ascription (`: _*`)
