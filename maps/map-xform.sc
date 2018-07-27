@@ -11,13 +11,12 @@ object MapAMapWithAXformMap {
       case (k, v) => {
         // make sure to return a tuple from all paths
         if (mapXform.contains(k)) {
-          val function = mapXform(k)._1
-          val xformer = function.op _
+          val xformer = mapXform(k)._1
           val operands = mapXform(k)._2
           val arg = mapXform(k)._3  // already an `Option`-al
 
           // match even necessary??
-          function match {
+          xformer match {
             case Reverse
                | Suffix
                | Prefix
@@ -67,21 +66,21 @@ abstract class Xformer {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // pass varargs, if any, via type ascription (`: _*`)
 case object Both extends Operands {
-  override def op(xformer: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
-    ( xformer(k, args: _*), xformer(v, args: _*) )
+  override def op(xformer: Xformer, k: String, v: String, args: Option[String]*): (String, String) =
+    ( xformer.op(k, args: _*), xformer.op(v, args: _*) )
 }
 case object Key extends Operands {
-  override def op(xformer: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
-    ( xformer(k, args: _*), v )  // return v unscathed
+  override def op(xformer: Xformer, k: String, v: String, args: Option[String]*): (String, String) =
+    ( xformer.op(k, args: _*), v )  // return v unscathed
 }
 case object Val extends Operands {
-  override def op(xformer: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String) =
-    ( k, xformer(v, args: _*) )  // return k unscathed
+  override def op(xformer: Xformer, k: String, v: String, args: Option[String]*): (String, String) =
+    ( k, xformer.op(v, args: _*) )  // return k unscathed
 }
 
 // handles both/key/val operand variations
 abstract class Operands {
-  def op(xformer: Xformer.Signature, k: String, v: String, args: Option[String]*): (String, String)
+  def op(xformer: Xformer, k: String, v: String, args: Option[String]*): (String, String)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +89,7 @@ import ammonite.ops._
 // (ಠ_ಠ)
 @main
 def main(args: String*) = {
-  // map a map using (functions in) another map
+  // map a map using (functions in) another map; has taken over the role of dispatcher
   val mapFrom: MapAMapWithAXformMap.StartMap = Map(
     "key1" -> "val1", "key2" -> "val2", "key3" -> "val3",
     "key4" -> "val4", "key5" -> "val5", "key6" -> "val6",
