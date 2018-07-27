@@ -89,7 +89,7 @@ import ammonite.ops._
 // (ಠ_ಠ)
 @main
 def main(args: String*) = {
-  // map a map using (functions in) another map; has taken over the role of dispatcher
+  // map a map using (functions in) another map
   val mapFrom: MapAMapWithAXformMap.StartMap = Map(
     "key1" -> "val1", "key2" -> "val2", "key3" -> "val3",
     "key4" -> "val4", "key5" -> "val5", "key6" -> "val6",
@@ -99,6 +99,7 @@ def main(args: String*) = {
     "key19" -> "val19"
   )
 
+  // has taken over the role of dispatcher
   val mapWith: MapAMapWithAXformMap.XformMap = Map(
     // arg supplied
     "key1" ->  (Suffix, Both, Some("-ix")), 
