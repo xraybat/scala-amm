@@ -41,16 +41,16 @@ def main(args: String*) = {
   println(cconcat("val")("-add-1"))
   //println(cconcat("val")("-add-1")("-add-2")) // how to make this "recursive"??
 
-  // different curried versions?? or partial functions??
+  // different curried versions
   def psuffix(v: String)(arg: String) = v + arg
   def pprefix(v: String)(arg: String) = arg + v
   def preplace(v: String)(arg: String) = arg
-  def pconcat(v: String)(arg: String) = v + arg
+  def pconcat(v: String)(arg1: String)(arg2: String) = v + arg1 + arg2
   println(psuffix("val")("-ix"))
   println(pprefix("val")("ix-"))
   println(preplace("val")("new"))
 
-  println(pconcat("val")("-add-1"))
-  //println(pconcat("val")("-add-1")("-add-2")) // how to make this "recursive"??
+  //println(pconcat("val")("-add-1"))         // bugger! this doesn't work now??
+  println(pconcat("val")("-add-1")("-add-2")) // how to make this "recursive"??
 
 } // main
