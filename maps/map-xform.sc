@@ -1,9 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // į̵̘͍̻̟͔̥̠̦̕ h͓o̢̼̪̞͢p̳̲͠e̯̦̘̝͈̼̱͝ y̷͕͕ơ̴̵̠ú̹̳̻̳̜’̩̰r̸̢̲͉̼̯̬̥ͅͅe̟̦͕̼̞͇͠ w̶̛̖͖̞͇e̷̯̰͎͖̮l̶̻̩̀͝ļ̰̦͈͢͠
 object MapAMapWithAXformMap {
-  type StartMap = Map[String, String]                               // start with a map...
-  type EndMap = StartMap                                            // ...and return a result map
-  type XformMap = Map[String, (Xformer, Operands, Option[String])]  // ...xformed via a xformation map
+  type StartMap = Map[String, String]                     // start with a map...
+  type EndMap = StartMap                                  // ...and return a result map...
+  type XformMap = Map[String, XformTuple]                 // ...xformed via a xformation map...
+  type XformTuple = (Xformer, Operands, Option[String])   // ...made up of these xformer tuples
     
   // map a map using (functions in) a xformation map
   def map(mapStart: StartMap, mapXform: XformMap): EndMap = {
@@ -11,9 +12,7 @@ object MapAMapWithAXformMap {
       case (k, v) => {
         // make sure to return a tuple from all paths
         if (mapXform.contains(k)) {
-          val xformer = mapXform(k)._1
-          val operands = mapXform(k)._2
-          val arg = mapXform(k)._3  // already an `Option`-al
+          val (xformer, operands, arg) = ((xt: XformTuple) => (xt._1, xt._2, xt._3))(mapXform(k))
 
           // match even necessary??
           xformer match {
@@ -38,7 +37,7 @@ class MapAMapWithAXformMap(mapStart: MapAMapWithAXformMap.StartMap, mapXform: Ma
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// xform functions; signatures should match type `Signature`; `v` is the value to be xformed,
+// xform functions; signatures should match type `Sig`; `v` is the value to be xformed,
 // `arg(0...)` are the extra (`Option`-al) args to be applied to the xformation
 case object Suffix extends Xformer {
   override def op(v: String, args: Option[String]*): String = v + args(0).getOrElse("")
@@ -55,7 +54,7 @@ case object Replace extends Xformer {
 
 object Xformer {
   // xform functions use optional varargs
-  type Signature = (String, Option[String]*) => String
+  type Sig = (String, Option[String]*) => String
 }
 
 // companion (abstract) class for xform function case object extends; insists on `op()` method
@@ -67,15 +66,15 @@ abstract class Xformer {
 // pass varargs, if any, via type ascription (`: _*`)
 case object Both extends Operands {
   override def op(xformer: Xformer, k: String, v: String, args: Option[String]*): (String, String) =
-    ( xformer.op(k, args: _*), xformer.op(v, args: _*) )
+    (xformer.op(k, args: _*), xformer.op(v, args: _*))
 }
 case object Key extends Operands {
   override def op(xformer: Xformer, k: String, v: String, args: Option[String]*): (String, String) =
-    ( xformer.op(k, args: _*), v )  // return v unscathed
+    (xformer.op(k, args: _*), v)  // return v unscathed
 }
 case object Val extends Operands {
   override def op(xformer: Xformer, k: String, v: String, args: Option[String]*): (String, String) =
-    ( k, xformer.op(v, args: _*) )  // return k unscathed
+    (k, xformer.op(v, args: _*))  // return k unscathed
 }
 
 // handles both/key/val operand variations
