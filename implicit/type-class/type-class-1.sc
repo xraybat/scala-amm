@@ -1,17 +1,15 @@
-////////////////////////////////////////////////////////////////////////////////////////////////////
-import ammonite.ops._
 
 sealed trait Json
-object Json{
+object Json {
   case class Str(s: String) extends Json
   case class Num(value: Double) extends Json
   // ... many more definitions
 }
 
-trait Jsonable[T]{
+trait Jsonable[T] {
   def serialize(t: T): Json
 }
-object Jsonable{
+object Jsonable{  // companion object
   implicit object StringJsonable extends Jsonable[String]{
     def serialize(t: String) = Json.Str(t)
   }
@@ -26,6 +24,9 @@ object Jsonable{
 def convertToJson[T](x: T)(implicit converter: Jsonable[T]): Json = {
   converter.serialize(x)
 }
+
+////////////////////////////////////////////////////////////////////////////////
+import ammonite.ops._
 
 @main
 def main(args: String*) = {
