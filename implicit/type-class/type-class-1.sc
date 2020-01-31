@@ -1,6 +1,6 @@
 
 sealed trait Json
-object Json {
+object Json {   // companion object
   case class Str(s: String) extends Json
   case class Num(value: Double) extends Json
   // ...many more definitions
