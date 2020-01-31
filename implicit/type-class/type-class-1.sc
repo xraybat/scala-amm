@@ -3,20 +3,20 @@ sealed trait Json
 object Json {
   case class Str(s: String) extends Json
   case class Num(value: Double) extends Json
-  // ... many more definitions
+  // ...many more definitions
 }
 
 trait Jsonable[T] {
   def serialize(t: T): Json
 }
 object Jsonable{  // companion object
-  implicit object StringJsonable extends Jsonable[String]{
+  implicit object StringJsonable extends Jsonable[String] {
     def serialize(t: String) = Json.Str(t)
   }
-  implicit object DoubleJsonable extends Jsonable[Double]{
+  implicit object DoubleJsonable extends Jsonable[Double] {
     def serialize(t: Double) = Json.Num(t)
   }
-  implicit object IntJsonable extends Jsonable[Int]{
+  implicit object IntJsonable extends Jsonable[Int] {
     def serialize(t: Int) = Json.Num(t.toDouble)
   }
 }
