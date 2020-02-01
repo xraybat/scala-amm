@@ -9,7 +9,7 @@ object Json {   // companion object
 trait Jsonable[T] {
   def serialize(t: T): Json
 }
-object Jsonable{  // companion object
+object Jsonable {  // companion object
   implicit object StringJsonable extends Jsonable[String] {
     def serialize(t: String) = Json.Str(t)
   }
@@ -25,7 +25,7 @@ def convertToJson[T](x: T)(implicit converter: Jsonable[T]): Json = {
   converter.serialize(x)
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 import ammonite.ops._
 
 @main
