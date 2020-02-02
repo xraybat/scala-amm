@@ -1,7 +1,10 @@
-trait Actor[T] {}
+trait Actor[T] {
+  def send(t: T)
+}
 
-abstract class BaseActor[T]() extends Actor[T] {}
-abstract class SimpleActor[T]() extends BaseActor[T] {}
+abstract class SimpleActor[T] extends Actor[T] {
+  def send(t: T) { t }
+}
 
 abstract class StateMachineActor[T]() extends SimpleActor[T]() {
   class State(run0: T => State = null) {
@@ -21,15 +24,20 @@ abstract class StateMachineActor[T]() extends SimpleActor[T]() {
 sealed trait Msg
 case class Ping() extends Msg
 case class Pong() extends Msg
-case class Out() extends Msg
 
 class PingPong extends StateMachineActor[Msg] {
   def initialState = Ponger()
 
+  case class Pinger() extends State({
+    case Ping() =>
+      println("ping")
+      Ponger()
+  })
+
   case class Ponger() extends State({
     case Pong() =>
       println("pong")
-      Ponger()
+      Pinger()
   })
 }
 
@@ -39,6 +47,7 @@ import ammonite.ops._
 @main
 def main(args: String*) = {
   val pp = new PingPong()
+  pp.send(Ping())
   println("hello")
 
 } // main
