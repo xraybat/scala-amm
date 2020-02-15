@@ -3,7 +3,7 @@ trait Actor[T] {
 }
 
 abstract class SimpleActor[T] extends Actor[T] {
-  def send(t: T) { t }
+  def send(t: T) { t }  // doesn't invoke state run
 }
 
 abstract class StateMachineActor[T]() extends SimpleActor[T]() {
