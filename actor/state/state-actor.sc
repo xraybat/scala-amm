@@ -3,57 +3,53 @@ trait Actor[T] {
 }
 
 abstract class SimpleActor[T] extends Actor[T] {
-  def send(t: T) { t }
-  
-  // doesn't invoke state `run()`
-  // because there isn't a parent one...until now:
+  def send(t: T) { println("SimpleActor.send, t is " + t + " (send doing nothing)") }
   def run(msg: T): Unit
 }
 
 abstract class StateMachineActor[T]() extends SimpleActor[T]() {
+  
   class State(run0: T => State = null) {
     def run = run0
   }
   protected[this] def initialState: State
-  private[this] var state0: State = null
+  private[this]   var state0: State = null
   protected[this] def state = {
     if (state0 == null) state0 = initialState
     state0
   }
+
   def run(msg: T): Unit = {
-    println("StateMachineActor.run, before")
+    println("StateMachineActor.run, msg is " + msg + ", state is " + state)
     state0 = state.run(msg)
-    println("StateMachineActor.run, after, state0 = " + state0)
   }
-} 
+} // StateMachineActor
 
 sealed trait Msg
 case class Ping() extends Msg
 case class Pong() extends Msg
 
-class PingPong extends StateMachineActor[Msg] {
-  def initialState = Ponger()
+class PingPongFsm extends StateMachineActor[Msg] {
+  def initialState = Pinger()
 
   case class Pinger() extends State({
-    case Ping() =>
-      println("ping")
-      Ponger()
+    case Ping() => println("Pinger.run, Ping()"); Pinger()
+    case Pong() => println("Pinger.run, Pong()"); Ponger()
   })
 
   case class Ponger() extends State({
-    case Pong() =>
-      println("pong")
-      Pinger()
+    case Pong() => println("Ponger.run, Pong()"); Ponger()
+    case Ping() => println("Ponger.run, Ping()"); Pinger()
   })
-}
+} // PingPongFsm
 
 //////////////////////////////////////////////////////////////////////
 import ammonite.ops._
 
 @main
 def main(args: String*) = {
-  val pp = new PingPong()
+  val pp = new PingPongFsm()
   pp.send(Ping())
-  println("hello")
+  pp.run(Ping())
 
 } // main
