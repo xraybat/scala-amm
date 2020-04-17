@@ -43,66 +43,59 @@ object OptionToTryIdiomatic {
 } // OptionToTryIdiomatic
 
 //======================================
-object OptionToTry extends App {
-  override def main(args: Array[String]) {
-    Options.anOption match {
-      case Some(value) => println(s"value: $value")
-      case None => println("nothing!")
-    } 
-
-    Options.aNone match { 
-      case Some(value) => println(s"value: $value")
-      case None => println("nothing!")
-    } 
-
-    Tries.aSuccess match {
-      case Success(value) => println(s"value: $value")
-      case Failure(s) => println(s"failed: $s")
-    } 
-
-    try {
-      Tries.anException match {
-        case Success(value) => println(s"value: $value")
-        case Failure(s) => println("this won't be reached")
-      }
-    } catch {
-      case m: MyException => println(s"failed: $m")
-    }
-
-    Tries.aFailure match {
-      case Success(value) => println(s"value: $value")
-      case Failure(s) => println(s"failed: $s")
-    } 
-
-    /*
-     * now convert an `Option` to a `Try[]`
-     */ 
-    OptionToTryMatch.anOptionSucceeds match {
-      case Success(value) => println(s"value: $value")
-      case Failure(s) => println(s"failed: $s")
-    } 
-
-    OptionToTryMatch.aNoneFails match {
-      case Success(value) => println(s"value: $value")
-      case Failure(s) => println(s"failed: $s")
-    } 
-
-    OptionToTryIdiomatic.anOptionSucceeds match {
-      case Success(value) => println(s"value: $value")
-      case Failure(s) => println(s"failed: $s")
-    } 
-
-    OptionToTryIdiomatic.aNoneFails match {
-      case Success(value) => println(s"value: $value")
-      case Failure(s) => println(s"failed: $s")
-    } 
-  } // main
-} // OptionToTry
-
-//======================================
 import ammonite.ops._
 
 @main
 def main(args: String*) = {
-  OptionToTry.main(Array(""))
-}
+  Options.anOption match {
+    case Some(value) => println(s"value: $value")
+    case None => println("nothing!")
+  } 
+
+  Options.aNone match { 
+    case Some(value) => println(s"value: $value")
+    case None => println("nothing!")
+  } 
+
+  Tries.aSuccess match {
+    case Success(value) => println(s"value: $value")
+    case Failure(s) => println(s"failed: $s")
+  } 
+
+  try {
+    Tries.anException match {
+      case Success(value) => println(s"value: $value")
+      case Failure(s) => println("this won't be reached")
+    }
+  } catch {
+    case m: MyException => println(s"failed: $m")
+  }
+
+  Tries.aFailure match {
+    case Success(value) => println(s"value: $value")
+    case Failure(s) => println(s"failed: $s")
+  } 
+
+  /*
+   * now convert an `Option` to a `Try[]`
+   */ 
+  OptionToTryMatch.anOptionSucceeds match {
+    case Success(value) => println(s"value: $value")
+    case Failure(s) => println(s"failed: $s")
+  } 
+
+  OptionToTryMatch.aNoneFails match {
+    case Success(value) => println(s"value: $value")
+    case Failure(s) => println(s"failed: $s")
+  } 
+
+  OptionToTryIdiomatic.anOptionSucceeds match {
+    case Success(value) => println(s"value: $value")
+    case Failure(s) => println(s"failed: $s")
+  } 
+
+  OptionToTryIdiomatic.aNoneFails match {
+    case Success(value) => println(s"value: $value")
+    case Failure(s) => println(s"failed: $s")
+  } 
+} // main
