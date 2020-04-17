@@ -53,8 +53,10 @@ case object Replace extends Xformer {
 }
 
 object Xformer {
-  // xform functions use optional varargs
-  type Sig = (String, Option[String]*) => String
+  // xform functions use optional varargs; was `Option[Seq]*` but error
+  // 'repeated parameters are only allowed in method signatures; use Seq
+  // instead' led to change to `Option[Seq[String]]`
+  type Sig = (String, Option[Seq[String]]) => String
 }
 
 // companion (abstract) class for xform function case object extends; insists on `op()` method
