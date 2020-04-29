@@ -1,3 +1,9 @@
+// sealed traits make adding methods easy (but new subclasses more difficult
+// since all methods need to be extended with the new subclass). open traits are
+// the opposite, adding new subclasses is easy, just implement exusting trait interface
+// methods, but adding methods is more difficult as all subclasses need to be
+// extended with the new method.
+
 sealed trait Expr
 case class BinOp(left: Expr, op: String, right: Expr) extends Expr
 case class Literal(value: Int) extends Expr

@@ -8,12 +8,36 @@ case class Dict(value: Map[String, Json]) extends Json
 
 def parse(token: Json) = token match {
   case Null() => "Null"
-  case Bool(value) => s"Bool: $value"
+  case Bool(value: Boolean) => s"Bool: $value"
   case Str(value: String) => s"Str: $value"
   case Num(value: Double) => s"Num: $value"
   case Arr(value: Seq[Json]) => s"Arr: $value"
   case Dict(value: Map[String, Json]) => s"Map: $value"
 }
+
+// a new method (easy)
+def stringify(token: Json): String = token match {
+  case Null() => "null"
+  case Bool(value: Boolean) => value.toString
+  case Str(value: String) => value.toString
+  case Num(value: Double) => value.toString
+  case Arr(value: Seq[Json]) => {
+    var str: String = ""
+    for (elem <- value) str + ", " + stringify(elem)
+    str
+  }
+  case Dict(value: Map[String, Json]) => {
+    var str: String = ""
+    for ((key,elem) <- value) str + ", " + stringify(Str(key)) + ": " + stringify(elem)
+    str
+  }
+}
+
+// sealed traits make adding methods easy (but new subclasses more difficult
+// since all methods need to be extended with the new subclass). open traits are
+// the opposite, adding new subclasses is easy, just implement exusting trait interface
+// methods, but adding methods is more difficult as all subclasses need to be
+// extended with the new method.
 
 //======================================
 import ammonite.ops._
@@ -26,9 +50,11 @@ def main(args: String*) = {
     Str("fred"),
     Num(11),
 
-    Arr(Array(
+    Arr(Seq(
       Null(),
-      Bool(true)
+      Bool(true),
+      Str("fred"),
+      Num(11)
     )),
 
     Dict(Map(
@@ -36,9 +62,11 @@ def main(args: String*) = {
       "key2" -> Bool(true),
       "key3" -> Str("fred"),
       "key4" -> Num(11),
-      "key5" -> Arr(Array(
+      "key5" -> Arr(Seq(
         Null(),
-        Bool(true)
+        Bool(true),
+        Str("fred"),
+        Num(11)
       )),
       "key6" -> Dict(Map(
         "key6.1" -> Null(),
@@ -51,5 +79,9 @@ def main(args: String*) = {
 
   for (t <- tokens)
     println(s"$t: " + parse(t))
+
+  println 
+  for (t <- tokens)
+    println(s"$t: " + stringify(t))
 
 } // main
