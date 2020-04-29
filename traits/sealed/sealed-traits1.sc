@@ -12,7 +12,11 @@ import ammonite.ops._
 
 @main
 def main(args: String*) = {
-  val points: Array[Point] = Array(Point2D(1, 2), Point3D(4, 5, 6))
+  val points: Array[Point] = Array(
+    Point2D(1, 2), 
+    Point3D(4, 5, 6)
+  )
+  
   for (p <- points)
     println(s"$p: " + hypotenuse(p))
 
