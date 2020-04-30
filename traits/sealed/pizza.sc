@@ -25,6 +25,7 @@ class Chef[Pizza <: Chef.Pizza](ingredients: Seq[String] = Seq()) {
   def addDough: Chef[Pizza with Dough] = new Chef(ingredients :+ "dough")
 
   // *type* `Pizza` must be equivalent, `=:=`, of `FullPizza`
+  // the (never instantiated) implicit `ev` forces (meta-)type information
   def build(implicit ev: Pizza =:= FullPizza): Food = Food(ingredients)
 
 } // Chef
