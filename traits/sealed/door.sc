@@ -1,3 +1,4 @@
+// traits (not case classes) since matching at compile time
 sealed trait DoorState
 sealed trait Open extends DoorState
 sealed trait Closed extends DoorState
