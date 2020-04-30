@@ -1,3 +1,5 @@
+// from https://medium.com/@maximilianofelice/builder-pattern-in-scala-with-phantom-types-3e29a167e863
+
 object Chef {
   sealed trait Pizza
   object Pizza {

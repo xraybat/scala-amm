@@ -1,3 +1,5 @@
+// from https://medium.com/@maximilianofelice/builder-pattern-in-scala-with-phantom-types-3e29a167e863
+
 // traits (not case classes) since matching at compile time
 sealed trait DoorState
 sealed trait Open extends DoorState
