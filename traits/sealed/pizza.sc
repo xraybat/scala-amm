@@ -3,7 +3,7 @@
 object Chef {
   sealed trait Pizza
   object Pizza {
-    // traits (not case classes) since matching at compile time
+    // traits (not case classes) since (type-)"matching" at compile time
     sealed trait EmptyPizza extends Pizza
     sealed trait Cheese extends Pizza
     sealed trait Topping extends Pizza
