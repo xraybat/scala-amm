@@ -26,6 +26,7 @@ case class Change[Step]()
 
 object TrafficLightTransition {
   def initial(tl: TrafficLight): TrafficLightState[Red] = TrafficLightState[Red]
+
   def stop(tls: TrafficLightState[Amber]): TrafficLightState[Red] = TrafficLightState[Red]
   def caution(tls: TrafficLightState[Red]): TrafficLightState[Amber] = TrafficLightState[Amber]
   def go(tls: TrafficLightState[Amber]): TrafficLightState[Green] = TrafficLightState[Green]
