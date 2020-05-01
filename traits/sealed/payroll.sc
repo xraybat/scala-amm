@@ -17,6 +17,8 @@ object Pipeline {
 }
 */
 
+// these will ensure that pre-, post-, and final PreTaxDeductions
+// are type-checked at each stage (in and out on method call)
 sealed trait PreTaxDeductions
 sealed trait PostTaxDeductions
 sealed trait Final
@@ -83,8 +85,8 @@ def main(args: String*) = {
   */
 
   val twoWeekGross = e.annualSalary / 26.0F
-  val twoWeekNet   = pay.netPay
-  val percent      = (twoWeekNet / twoWeekGross) * 100
+  val twoWeekNet = pay.netPay
+  val percent  = (twoWeekNet / twoWeekGross) * 100
 
   println(
     s"For ${e.name}, the gross vs. net pay every 2 weeks is:\n" 
