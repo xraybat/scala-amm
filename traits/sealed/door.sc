@@ -6,7 +6,7 @@ sealed trait Open extends DoorState
 sealed trait Closed extends DoorState
 
 // *type* `State` must be subtype, `<:`, of `DoorState`
-case class Door[State <: DoorState](){
+case class Door[State <: DoorState]() {
   // `State` *types* must be equivalent, `=:=`, of (sub-)`DoorState`s
   // the (never instantiated) implicit `ev` forces (meta-)type information
   def open(implicit ev: State =:= Closed) = Door[Open]()
