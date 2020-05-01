@@ -42,6 +42,7 @@ object Payroll {
 
   def minusInsurance(pay: Pay[PreTaxDeductions]): Pay[PreTaxDeductions] = {
     val newNet = pay.netPay - pay.employee.insurancePremiumsPerPayPeriod
+    // immutable copy on case class
     pay copy (netPay = newNet)
   }
 
