@@ -21,13 +21,12 @@ TrafficLightState[Amber]().go
 //TrafficLightState[Green]().stop
 //TrafficLightState[Red]().go
 
-case class TrafficLight(signal: Colour)
-case class Change[Step]()
+object TrafficLight {
+  private var tls[Red]: TrafficLightState[Red]
 
-object TrafficLightTransition {
-  def initial(tl: TrafficLight): TrafficLightState[Red] = TrafficLightState[Red]
+  def initial: TrafficLightState[Red] = TrafficLightState[Red]
 
-  def stop(tls: TrafficLightState[Amber]): TrafficLightState[Red] = TrafficLightState[Red]
-  def caution(tls: TrafficLightState[Red]): TrafficLightState[Amber] = TrafficLightState[Amber]
-  def go(tls: TrafficLightState[Amber]): TrafficLightState[Green] = TrafficLightState[Green]
+  def stop: TrafficLightState[Red] = TrafficLightState[Red]
+  def caution: TrafficLightState[Amber] = TrafficLightState[Amber]
+  def go: TrafficLightState[Green] = TrafficLightState[Green]
 }
