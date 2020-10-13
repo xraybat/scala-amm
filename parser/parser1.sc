@@ -1,31 +1,77 @@
 import fastparse._, SingleLineWhitespace._
 
-// add `.map(_.toInt)` after `.!` for x and y
-
-
 object CoordParser {
   val keywordCoord = "coord"
 
   def parse(str: String): Unit = {
-   def parser[_: P] = 
-     P(keywordCoord.!
-       ~ CharIn("0-9").rep(1).! ~ "," ~ CharIn("0-9").rep(1).!
-       ~ End)
+    def parser[_: P] = 
+      P(keywordCoord.!
+        ~ CharIn("0-9").rep(1).!.map(_.toInt)
+        ~ "," ~ CharIn("0-9").rep(1).!.map(_.toInt)
+        ~ End)
 
-     print("CoordParser.parse: ")
-     fastparse.parse(str, parser(_)) match {
-       case Parsed.Success(value, index) => {
-         println(s"found ${keywordCoord}, value = ${value}, index = ${index}")
-         println(s"value._1 = ${value._1}")
-         println(s"value._2 = ${value._2}")
-         println(s"value._3 = ${value._3}")
-       }
-       case Parsed.Failure(expected, index, extra) => println(extra.trace().longMsg)
-       case _ => println("problem parsing ${keywordCoord}") 
-        
+    print("CoordParser.parse: ")
+    fastparse.parse(str, parser(_)) match {
+      case Parsed.Success(value, index) => {
+        println(s"found ${keywordCoord}, value = ${value}, index = ${index}")
+        println(s"value._1 = ${value._1}")
+        println(s"value._2 = ${value._2}")
+        println(s"value._3 = ${value._3}")
+      }
+      case Parsed.Failure(expected, index, extra) => println(extra.trace().longMsg)
+      case _ => println("problem parsing ${keywordCoord}") 
+
    } // match
  } // parse
 } // CoordParser
+
+// try coord x,y
+//     up
+//     down
+//     left
+//     right 
+object CoordAndMove {
+  val keywordCoord = "coord"
+  val commandUp = "up"
+  val commandDown = "down"
+  val commandLeft = "left"
+  val commandRight = "right"
+
+  def parse(str: String): Unit = {
+    def parserKeyword[_: P] = 
+      P(keywordCoord.!
+        ~ CharIn("0-9").rep(1).!.map(_.toInt)
+        ~ "," ~ CharIn("0-9").rep(1).!.map(_.toInt)
+        ~ End)
+    def parserCommands[_: P] = 
+      P(parserKeyword
+        | commandUp.!
+        | commandDown.!
+        | commandLeft.!
+        | commandRight.!
+        ~ End)
+
+    print("CoordAndMove.parse: ")
+    fastparse.parse(str, parserCommands(_)) match {
+      case Parsed.Success(value, index) => {
+        println(s"found ${keywordCoord}, value = ${value}, getClass = ${value.getClass}, index = ${index}")
+        value match {
+          case (m: String, x: Int, y: Int) => {
+            println(s"x = ${x}")
+            println(s"y = ${y}")
+            println(s"m = ${m}")
+          }
+          case c: String =>
+            println(s"c = ${c}")
+          case _ => println("problem matching value ${value}") 
+        }
+      }
+      case Parsed.Failure(expected, index, extra) => println(extra.trace().longMsg)
+      case _ => println("problem parsing ${keywordCoord}") 
+
+   } // match
+ } // parse
+} // CoordAndMove
 
 object PlaceParser {
   val keywordPlace = "PLACE"
@@ -42,7 +88,9 @@ object PlaceParser {
   def parse(str: String): Unit = {
     def parser[_: P] = 
       P(keywordPlace.!
-        ~ CharIn("0-9").rep(1).! ~ "," ~ CharIn("0-9").rep(1).!
+        ~ CharIn("0-9").rep(1).!.map(_.toInt)
+          ~ ","
+          ~ CharIn("0-9").rep(1).!.map(_.toInt)
         ~ ","
         ~ (Orientation.North.toString.!
           | Orientation.East.toString.!
@@ -75,6 +123,12 @@ def main(args: String*) = {
 
   val coord = s"${CoordParser.keywordCoord} 1,20"
   CoordParser.parse(coord)
+
+  CoordAndMove.parse(coord)
+  CoordAndMove.parse(CoordAndMove.commandUp)
+  CoordAndMove.parse(CoordAndMove.commandDown)
+  CoordAndMove.parse(CoordAndMove.commandLeft)
+  CoordAndMove.parse(CoordAndMove.commandRight)
 
   val place1 = s"${PlaceParser.keywordPlace} 1,20,NORTH"
   PlaceParser.parse(place1)
