@@ -68,7 +68,7 @@ def main(args: String*) = {
       case Failure(s) => println("this won't be reached")
     }
   } catch {
-    case m: MyException => println(s"failed: $m")
+    case m: MyException => println(s"exception: $m")
   }
 
   Tries.aFailure match {
