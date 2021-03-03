@@ -5,6 +5,7 @@ def removeFours(lst: List[Int], acc: List[Int] = List.empty): List[Int] = lst ma
   case h :: t => removeFours(t, h :: acc)
 }
 
+// actually creates a new list...
 def traverse(lst: List[Int], acc: List[Int] = List.empty): List[Int] = lst match {
   case Nil    => acc.reverse
   case h :: t => traverse(t, h :: acc)
@@ -33,5 +34,4 @@ def main(args: String*) = {
   println("traverse: " + traverse(lst))
   println("reverse: " + reverse(lst))     // same as `lst.reverse`
   println("sum: " + sum(lst))
-
 }
