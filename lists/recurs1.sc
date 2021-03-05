@@ -1,14 +1,14 @@
-
+// creates new list
 def removeFours(lst: List[Int], acc: List[Int] = List.empty): List[Int] = lst match {
   case Nil    => acc.reverse
   case 4 :: t => removeFours(t, acc)
   case h :: t => removeFours(t, h :: acc)
 }
 
-// actually creates a new list...
-def traverse(lst: List[Int], acc: List[Int] = List.empty): List[Int] = lst match {
+// was `traverse()` but creates a new list...
+def copy(lst: List[Int], acc: List[Int] = List.empty): List[Int] = lst match {
   case Nil    => acc.reverse
-  case h :: t => traverse(t, h :: acc)
+  case h :: t => copy(t, h :: acc)
 }
 
 def reverse(lst: List[Int], acc: List[Int] = List.empty): List[Int] = lst match {
@@ -31,7 +31,7 @@ def main(args: String*) = {
   println(lst)
 
   println("removeFours: " + removeFours(lst))
-  println("traverse: " + traverse(lst))
+  println("traverse: " + copy(lst))
   println("reverse: " + reverse(lst))     // same as `lst.reverse`
   println("sum: " + sum(lst))
 }

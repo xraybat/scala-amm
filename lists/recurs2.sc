@@ -22,10 +22,11 @@ case class Right() extends Op with Dir {
   def msg: String = "right"
 }
 
-// @QU: actually creates a new list...how does `acc` work??
-def traverse(lst: List[Op], acc: List[Op] = List.empty): List[Op] = lst match {
+// was `traverse()` but creates a new list...
+// @QU: how does `acc` work??
+def copy(lst: List[Op], acc: List[Op] = List.empty): List[Op] = lst match {
   case Nil    => acc.reverse
-  case h :: t => traverse(t, h :: acc)
+  case h :: t => copy(t, h :: acc)
 }
 
 def operate(lst: List[Op]): Unit = lst match {
@@ -57,7 +58,7 @@ import ammonite.ops._
 def main(args: String*) = {
   val lst = Up() :: Down() :: Left() :: Right() :: Nil   // `()` and `Nil` reqd
   println(lst)
-  println("traverse: " + traverse(lst))
+  println("copy: " + copy(lst))
   operate(lst)
 
   val ops = new Ops
