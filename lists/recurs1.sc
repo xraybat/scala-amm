@@ -22,7 +22,6 @@ def sum(lst: List[Int]): Int = lst match {
 }
 
 //////////////////////////////////////////////////////////////////////
-import ammonite.ops._
 
 // (ಠ_ಠ)
 @main

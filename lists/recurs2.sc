@@ -51,22 +51,27 @@ class MyList[T] {
 class Ops extends MyList[Op]
 
 //////////////////////////////////////////////////////////////////////
-import ammonite.ops._
 
 // (ಠ_ಠ)
 @main
 def main(args: String*) = {
   val lst = Up() :: Down() :: Left() :: Right() :: Nil   // `()` and `Nil` reqd
   println(lst)
-  println("copy: " + copy(lst))
-  operate(lst)
+  //println("copy: " + copy(lst))
+  val lst2 = lst.map(x => x.op)   // creates a list of empty elements...
+  println("lst2: " + lst2)
 
   val ops = new Ops
   ops.add(Up())
   ops.add(Down())
   ops.add(Left())
   ops.add(Right())
-  //println(ops)
   operate(ops.list)
+
+  /*def timesThree(i: Int): Int = i*3
+  val ints = 1 :: 2 :: 3 :: 4 :: 5 :: Nil
+  //println("map timesThree: " + ints.map(x => x*3))
+  println("map timesThree: " + ints.map(timesThree))
+  */
 
 }
