@@ -13,11 +13,28 @@ case class Door[State <: DoorState]() {
   def close(implicit ev: State =:= Open) = Door[Closed]()
 }
 
-def open(implicit ev: State =:= Closed) = Door[Open]()
-
 Door[Open]().close
 Door[Closed]().open
 
 // causes *compile* time type errors (even w/out an implicit `ev`)
-Door[Open]().open
-Door[Closed]().close
+//Door[Open]().open
+//Door[Closed]().close
+
+// or...
+trait AbstractState
+
+abstract class AbstractDoor {
+  type State <: AbstractState
+  def state: State
+  //val _state: State   // note: using a '_' prefix (only) causes a compile error...
+}
+
+trait OpenDoor extends AbstractState
+class Opens(val state: OpenDoor) extends AbstractDoor {
+  type State = OpenDoor
+}
+
+trait CloseDoor extends AbstractState // commenting out 'extends' causes *compile* time type error
+class Closes(val state: CloseDoor) extends AbstractDoor {
+  type State = CloseDoor
+}
