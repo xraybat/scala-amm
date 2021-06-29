@@ -21,12 +21,11 @@ Door[Closed]().open
 //Door[Closed]().close
 
 // or...
-trait AbstractState
+/*trait AbstractState
 
 abstract class AbstractDoor {
   type State <: AbstractState
   def state: State
-  //val _state: State   // note: using a '_' prefix (only) causes a compile error...
 }
 
 trait OpenDoor extends AbstractState
@@ -34,7 +33,28 @@ class Opens(val state: OpenDoor) extends AbstractDoor {
   type State = OpenDoor
 }
 
-trait CloseDoor extends AbstractState // commenting out 'extends' causes *compile* time type error
+// commenting out 'extends'causes *compile* time type error
+trait CloseDoor extends AbstractState
 class Closes(val state: CloseDoor) extends AbstractDoor {
+  type State = CloseDoor
+}*/
+
+// or...this might be a more canonical (simpler) way, no vals needed,
+// obvious (sealed) trait implementation from case class arguments.
+sealed trait AbstractState
+
+sealed trait AbstractDoor {
+  type State <: AbstractState
+  def state: State
+}
+
+sealed trait OpenDoor extends AbstractState
+case class Opens(state: OpenDoor) extends AbstractDoor {
+  type State = OpenDoor
+}
+
+// commenting out 'extends' causes *compile* time type error
+sealed trait CloseDoor extends AbstractState
+case class Closes(state: CloseDoor) extends AbstractDoor {
   type State = CloseDoor
 }
