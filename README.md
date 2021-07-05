@@ -1,4 +1,4 @@
-# groovy-strings
+# scala-amm
 
 https://github.com/xraybat/scala-amm
 
