@@ -14,7 +14,6 @@ object Cloud {
 } // Cloud
 
 //======================================
-import ammonite.ops._
 
 @main
 def main(args: String*) = {

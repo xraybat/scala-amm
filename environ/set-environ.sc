@@ -2,7 +2,7 @@ import sys.process._
 import java.io.File
 
 object SetEnviron extends App {
-  override def main(args: Array[String]) {
+  def myMain(args: Array[String]) {
     println(Process("ls -al").!!)
     println("ls -al".!!)
     println("pwd".!!.trim)
@@ -24,9 +24,8 @@ object SetEnviron extends App {
 } // SetEnviron
 
 //======================================
-import ammonite.ops._
 
 @main
 def main(args: String*) = {
-  SetEnviron.main(Array(""))
+  SetEnviron.myMain(Array(""))
 }

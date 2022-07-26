@@ -14,8 +14,7 @@ def hypotenuse(p: Point) = p match {
   case Point3D(x, y, z) => math.sqrt(x * x + y * y + z * z)
 }
 
-//======================================
-import ammonite.ops._
+//====================================================================
 
 @main
 def main(args: String*) = {

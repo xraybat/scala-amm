@@ -100,7 +100,6 @@ object CommandsOptionParsed {
 } // CommandsOptionParsed
 
 //////////////////////////////////////////////////////////////////////
-import ammonite.ops._
 
 // (ಠ_ಠ)
 @main

@@ -44,7 +44,6 @@ class PingPongFsm extends StateMachineActor[Msg] {
 } // PingPongFsm
 
 //////////////////////////////////////////////////////////////////////
-import ammonite.ops._
 
 @main
 def main(args: String*) = {

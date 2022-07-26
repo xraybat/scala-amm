@@ -1,5 +1,5 @@
 object Strings1 extends App {
-  override def main(args: Array[String]) {
+  def myMain(args: Array[String]) {
     val hello = "hello, world!"
 
     println(hello)
@@ -26,10 +26,9 @@ object Strings1 extends App {
   } // main
 } // Strings1
 
-//======================================
-import ammonite.ops._
+//====================================================================
 
 @main
 def main(args: String*) = {
-  Strings1.main(Array(""))
+  Strings1.myMain(Array(""))
 }

@@ -58,7 +58,6 @@ object HelloWorld2 extends App {
 }
 
 //======================================
-import ammonite.ops._
 
 @main
 def main(i: Int, s: String, path: Path = pwd) = {

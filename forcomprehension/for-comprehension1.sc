@@ -1,7 +1,3 @@
-
-//======================================
-import ammonite.ops._
-
 @main
 def main(args: String*) = {
   val nieces = List("emily", "hannah", "mercedes", "porsche")

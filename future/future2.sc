@@ -3,7 +3,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{ Failure, Success }
 
 //======================================
-import ammonite.ops._
 
 @main
 def main(args: String*) = {

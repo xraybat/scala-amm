@@ -40,8 +40,7 @@ def stringify(token: Json): String = token match {
 // adding methods is more difficult as all subclasses need to be
 // extended with the new method.
 
-//======================================
-import ammonite.ops._
+//====================================================================
 
 @main
 def main(args: String*) = {

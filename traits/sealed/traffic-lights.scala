@@ -1,4 +1,3 @@
-import ammonite.ops._
 
 sealed trait Colour
 sealed trait Red extends Colour

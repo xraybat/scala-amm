@@ -2,8 +2,7 @@ object Stub {
   def doIt: Unit = ???  // will compile, but won't execute
 }
 
-//======================================
-import ammonite.ops._
+//====================================================================
 
 // (ಠ_ಠ)
 @main

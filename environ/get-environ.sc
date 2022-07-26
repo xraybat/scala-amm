@@ -2,7 +2,7 @@ import sys.process._
 import java.io.File
 
 object GetEnviron extends App {
-  override def main(args: Array[String]) {
+  def myMain(args: Array[String]) {
     println(Process(Seq("bash", "-c", "echo $M2_HOME")).!!.trim)
     Process(Seq("bash", "-c", "echo $M2_HOME")).!
     println(Process(Seq("bash", "-c", "echo $M2_HOME")).!)
@@ -16,9 +16,8 @@ object GetEnviron extends App {
 } // GetEnviron
 
 //======================================
-import ammonite.ops._
 
 @main
 def main(args: String*) = {
-  GetEnviron.main(Array(""))
+  GetEnviron.myMain(Array(""))
 }

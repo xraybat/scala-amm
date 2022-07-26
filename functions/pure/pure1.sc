@@ -15,7 +15,6 @@ def iCalc(x: Int, i: (Int) => Int): Int = i(x)
 def jCalc(x: Int, y: Int, j: (Int, Int) => Int): Int = j(x, y)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-import ammonite.ops._
 
 // (ಠ_ಠ)
 @main

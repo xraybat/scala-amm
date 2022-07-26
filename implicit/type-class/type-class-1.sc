@@ -26,7 +26,6 @@ def convertToJson[T](x: T)(implicit converter: Jsonable[T]): Json = {
 }
 
 //////////////////////////////////////////////////////////////////////
-import ammonite.ops._
 
 @main
 def main(args: String*) = {

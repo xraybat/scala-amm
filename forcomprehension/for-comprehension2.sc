@@ -1,7 +1,3 @@
-
-//======================================
-import ammonite.ops._
-
 @main
 def main(args: String*) = {
   // preferred style '{}'

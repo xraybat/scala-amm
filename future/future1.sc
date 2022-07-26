@@ -4,7 +4,6 @@ import scala.util.{ Failure, Success }
 import scala.util.Random
 
 //======================================
-import ammonite.ops._
 
 @main
 def main(args: String*) = {

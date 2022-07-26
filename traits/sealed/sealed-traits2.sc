@@ -16,8 +16,7 @@ def stringify(expr: Expr): String = expr match {
   case Variable(name) => name
 }
 
-//======================================
-import ammonite.ops._
+//====================================================================
 
 @main
 def main(args: String*) = {

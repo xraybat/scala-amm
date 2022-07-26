@@ -1,5 +1,5 @@
 object Regex1 extends App {
-  override def main(args: Array[String]) {
+  def myMain(args: Array[String]) {
     val regex1 = raw"[0-9]+".r  // `.r` method creates regex object
     val addr = "123 main street, suite 101" 
     val foundOne = regex1.findFirstIn(addr).getOrElse("nothing") 
@@ -14,10 +14,9 @@ object Regex1 extends App {
   } // main
 } // Regex1
 
-//======================================
-import ammonite.ops._
+//====================================================================
 
 @main
 def main(args: String*) = {
-  Regex1.main(Array(""))
+  Regex1.myMain(Array(""))
 }

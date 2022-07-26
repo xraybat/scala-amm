@@ -42,8 +42,7 @@ object OptionToTryIdiomatic {
   }
 } // OptionToTryIdiomatic
 
-//======================================
-import ammonite.ops._
+//====================================================================
 
 @main
 def main(args: String*) = {

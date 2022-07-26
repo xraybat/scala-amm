@@ -1,6 +1,3 @@
-////////////////////////////////////////////////////////////////////////////////
-import ammonite.ops._
-
 def fibonacci(n: Int): Int = {
   @annotation.tailrec
   def go(n: Int, prev: Int, curr: Int): Int = {
